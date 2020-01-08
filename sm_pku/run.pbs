@@ -1,0 +1,82 @@
+#!/bin/bash
+#PBS -N sm_mpi
+#PBS -l nodes=1:ppn=20
+##PBS -l nodes=node17:ppn=2+node18:ppn=2+node20:ppn=2  #number of nodes,processors per node(CPUs per node)#
+#PBS -q batch
+#PBS -j oe
+#PBS -k oe
+cd $PBS_O_WORKDIR
+echo $PBS_WALLTIME
+
+#path="./operators_input/PKU_format/"
+path="/home_data/hubsh/work/Veff_complex_openmp/"
+outfile="minus_EKK_3rd_-20_sdpf7_n2lo-opt_N11_hw20_O24A24"
+ sp="EKK_3rd_-20_sdpf7_n2lo-opt_N11_hw20_O24A24.sp"
+int="EKK_3rd_-20_sdpf7_n2lo-opt_N11_hw20_O24A24.int"
+name="F"
+coreA=24
+EM=M1
+Jm2=0
+Par=1
+OBorTB="0"
+
+for vN in 0 1 2 3 4 5 6 7 8
+do
+for vZ in 1
+do
+vA=`expr ${vN} + ${vZ}`
+A=`expr ${coreA} + ${vA}`
+if [ ${Jm2} -lt 2 ]
+then
+JM2=`echo "scale=0; $A%2"|bc`
+else
+JM2=${Jm2}
+fi
+#PAR=`echo "scale=0; ${Par}*(${JM2}%2)"|bc`
+PAR=${Par}
+echo ${outfile}
+echo ${name}$A"   "${EM}"    JM2:"${JM2}"    PAR:"${PAR}
+
+echo ${path}${sp} > input_eff2.txt
+echo ${path}${int} >> input_eff2.txt
+echo "./results/"${name}${A}_${outfile}".dat" >> input_eff2.txt
+#echo "./results/"${name}${A}_${EM}_${outfile}".dat" >> input_eff2.txt
+echo ${vN}>> input_eff2.txt
+echo ${vZ}>> input_eff2.txt
+echo "10000  0  0">> input_eff2.txt
+echo ${JM2}>> input_eff2.txt
+echo ${PAR}>> input_eff2.txt
+echo "10">> input_eff2.txt
+echo "0">> input_eff2.txt
+if [ ${OBorTB} == "0" ] 
+then
+echo "0" >> input_eff2.txt
+else
+echo "1 "${path}${outfile}"_"${EM}"_1b.op  "${path}${outfile}"_"${EM}"_2b.op" >> input_eff2.txt
+fi
+
+echo >> input_eff2.txt
+echo >> input_eff2.txt
+echo >> input_eff2.txt
+echo >> input_eff2.txt
+echo "#############################################
+spfile          #single particle file
+vfile           #interaction file
+outputfile      #output file
+vN              #valence neutron number
+vZ              #valence proton number
+Emax, restriction for n,p   #restriction on configuration energy, total scatering state
+MM              #all configurations have angular momentum projection MM=2M
+                 #for even A, MM=0; for odd A, MM=1
+Par             #parity, 0 for +, 1 for -
+num of states   #number of states wanted
+printOccuNums   #whether print occupation number, 1 for yes, 0 for no
+calOper   1BOperfile  2BOperfile      #whether cal. other operators, 0 for no, 1 for yes.
+                                      #if yes, the following file will be used
+" >> input_eff2.txt
+
+#./test.exe < input_eff2.txt
+mpiexec -np 1 -hostfile $PBS_NODEFILE ./test.exe < input_eff2.txt
+
+done
+done

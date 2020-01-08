@@ -1,0 +1,30 @@
+./operators_input/magnus_O16_psd-shell_hw25_e4_A16_pku.sp
+./operators_input/magnus_O16_psd-shell_hw25_e4_A16_pku.int
+./results/Li6_1b_O16_psd-shell_hw25_e4_A16.dat
+1
+1
+10000  0  0
+0
+0
+10
+0
+1 ./operators_input/magnus_O16_psd-shell_hw25_e4_A16_Rp2_1b.op  ./operators_input/magnus_O16_psd-shell_hw25_e4_A16_Rp2_2b_zero.op
+
+
+
+
+#############################################
+spfile          #single particle file
+vfile           #interaction file
+outputfile      #output file
+vN              #valence neutron number
+vZ              #valence proton number
+Emax, restriction for n,p   #restriction on configuration energy, total scatering state
+MM              #all configurations have angular momentum projection MM=2M
+                 #for even A, MM=0; for odd A, MM=1
+Par             #parity, 0 for +, 1 for -
+num of states   #number of states wanted
+printOccuNums   #whether print occupation number, 1 for yes, 0 for no
+calOper   1BOperfile  2BOperfile      #whether cal. other operators, 0 for no, 1 for yes.
+                                      #if yes, the following file will be used
+
